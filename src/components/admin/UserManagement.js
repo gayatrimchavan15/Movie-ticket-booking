@@ -11,42 +11,47 @@ export default function UserManagement() {
     const usersRef = ref(db, "users");
     onValue(usersRef, snapshot => {
       const data = snapshot.val();
-      if (data) {
-        setUsers(
-          Object.entries(data).map(([id, user]) => ({
-            id,
-            ...user
-          }))
-        );
-      } else {
-        setUsers([]);
-      }
+      setUsers(
+        data
+          ? Object.entries(data).map(([id, user]) => ({ id, ...user }))
+          : []
+      );
     });
   }, []);
 
   function handleDelete(id) {
     if (window.confirm("Delete this user?")) {
       remove(ref(db, `users/${id}`))
-        .then(() => setMessage("User deleted!"))
-        .catch(() => setMessage("Error deleting user."));
+        .then(() => setMessage("✅ User deleted!"))
+        .catch(() => setMessage("❌ Error deleting user."));
     }
   }
 
   return (
-    <div style={{ display: "flex", minHeight: "100vh", background: "#f3f7fc" }}>
+    <div style={containerStyle}>
       <Sidebar activePath="/admin/user-management" />
-      <div style={{ flex: 1, padding: "40px 30px" }}>
-        <h2 style={{ color: "#5145cd", fontWeight: "bold", fontSize: 30, marginBottom: 28 }}>
-          User Management
-        </h2>
+      <div style={mainContentStyle}>
+        <h2 style={headingStyle}>👤 User Management</h2>
+
+        {/* Message */}
         {message && (
-          <div style={{
-            marginBottom: 18,
-            color: message.includes("deleted") ? "#27ae60" : "#c0392b",
-            fontSize: 16
-          }}>{message}</div>
+          <div
+            style={{
+              marginBottom: 20,
+              padding: "12px 16px",
+              borderRadius: 8,
+              background: message.includes("deleted") ? "#d4edda" : "#f8d7da",
+              color: message.includes("deleted") ? "#155724" : "#721c24",
+              fontSize: 15,
+              fontWeight: 600,
+            }}
+          >
+            {message}
+          </div>
         )}
-        <div style={tableSectionStyle}>
+
+        {/* Table */}
+        <div style={tableContainerStyle}>
           <table style={tableStyle}>
             <thead>
               <tr>
@@ -60,25 +65,33 @@ export default function UserManagement() {
             <tbody>
               {users.length === 0 ? (
                 <tr>
-                  <td style={tdEmptyStyle} colSpan={5}>No users found</td>
+                  <td style={tdEmptyStyle} colSpan={5}>
+                    No users found
+                  </td>
                 </tr>
               ) : (
-                users.map(user => (
-                  <tr key={user.id}>
+                users.map((user, index) => (
+                  <tr
+                    key={user.id}
+                    style={{
+                      backgroundColor: index % 2 === 0 ? "#ffffff" : "#f9fbfd",
+                      transition: "background 0.2s",
+                    }}
+                    onMouseEnter={(e) =>
+                      (e.currentTarget.style.backgroundColor = "#eef6ff")
+                    }
+                    onMouseLeave={(e) =>
+                      (e.currentTarget.style.backgroundColor =
+                        index % 2 === 0 ? "#ffffff" : "#f9fbfd")
+                    }
+                  >
                     <td style={tdNameStyle}>{user.name || user.fullName || "-"}</td>
                     <td style={tdEmailStyle}>{user.email || "-"}</td>
                     <td style={tdPhoneStyle}>{user.phone || user.mobile || "-"}</td>
                     <td style={tdRegStyle}>{user.registeredAt || user.date || "-"}</td>
                     <td style={tdActionStyle}>
-                      <button
-                        onClick={() => handleDelete(user.id)}
-                        style={{
-                          background: "#e74c3c", color: "#fff",
-                          border: "none", borderRadius: 4, padding: "6px 14px",
-                          cursor: "pointer", fontSize: 14
-                        }}
-                      >
-                        Delete
+                      <button style={deleteBtnStyle} onClick={() => handleDelete(user.id)}>
+                        🗑 Delete
                       </button>
                     </td>
                   </tr>
@@ -92,58 +105,98 @@ export default function UserManagement() {
   );
 }
 
-const tableSectionStyle = {
-  background: "#fff", borderRadius: "13px", boxShadow: "0 4px 18px #c6cbd233",
-  padding: "32px", marginTop: "10px", maxWidth: 850, minWidth: 320
+// --- Modern Professional Styles ---
+const containerStyle = { 
+  display: "flex", 
+  minHeight: "100vh", 
+  background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+  fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif"
 };
-const tableStyle = {
-  width: "100%",
-  background: "none",
+
+const mainContentStyle = { 
+  flex: 1, 
+  padding: "30px", 
+  background: "rgba(255, 255, 255, 0.95)",
+  backdropFilter: "blur(10px)",
+  margin: "20px",
+  marginLeft: "280px",
+  borderRadius: "20px",
+  boxShadow: "0 20px 40px rgba(0,0,0,0.1)",
+  overflowY: "auto"
+};
+
+const headingStyle = { 
+  fontSize: "2.5rem", 
+  fontWeight: "800", 
+  background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+  WebkitBackgroundClip: "text",
+  WebkitTextFillColor: "transparent",
+  margin: "0 0 30px 0",
+  letterSpacing: "-0.5px"
+};
+
+const tableContainerStyle = {
+  background: "white",
+  borderRadius: "16px",
+  boxShadow: "0 4px 20px rgba(0,0,0,0.08)",
+  padding: "30px",
+  border: "1px solid rgba(255,255,255,0.2)",
+  marginBottom: "30px"
+};
+
+const tableStyle = { 
+  width: "100%", 
   borderCollapse: "collapse",
+  borderRadius: "12px",
+  overflow: "hidden"
 };
-const thStyle = {
-  background: "#5145cd",
-  color: "#fff",
-  padding: "13px 10px",
-  textAlign: "left",
-  fontSize: 17,
-  borderBottom: "2px solid #eaeaea",
-  fontWeight: "bold"
+
+const thStyle = { 
+  background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)", 
+  color: "white", 
+  padding: "16px 12px", 
+  textAlign: "left", 
+  fontSize: "14px", 
+  fontWeight: "700",
+  textTransform: "uppercase",
+  letterSpacing: "0.5px"
 };
-const tdStyle = {
-  padding: "13px 9px",
-  borderBottom: "1px solid #edf0f7",
-  fontSize: 16,
-  fontWeight: 550,
-  background: "#fcfcff"
+
+const tdStyle = { 
+  padding: "16px 12px", 
+  borderBottom: "1px solid #E5E7EB", 
+  fontSize: "14px", 
+  fontWeight: "500", 
+  color: "#374151",
+  transition: "background-color 0.2s ease"
 };
-const tdNameStyle = {
-  ...tdStyle,
-  color: "#232946",
-  fontWeight: 700
+
+const tdNameStyle = { ...tdStyle, fontWeight: "700", color: "#1F2937" };
+const tdEmailStyle = { ...tdStyle, fontWeight: "600", color: "#3B82F6" };
+const tdPhoneStyle = { ...tdStyle, color: "#10B981" };
+const tdRegStyle = { ...tdStyle, color: "#F59E0B" };
+const tdActionStyle = { ...tdStyle, color: "#EF4444", fontWeight: "600" };
+const tdEmptyStyle = { 
+  ...tdStyle, 
+  textAlign: "center", 
+  fontSize: "16px", 
+  color: "#9CA3AF", 
+  fontWeight: "500",
+  fontStyle: "italic",
+  padding: "40px"
 };
-const tdEmailStyle = {
-  ...tdStyle,
-  color: "#3777ee",
-  fontWeight: 600
-};
-const tdPhoneStyle = {
-  ...tdStyle,
-  color: "#14bb7a"
-};
-const tdRegStyle = {
-  ...tdStyle,
-  color: "#b59400"
-};
-const tdActionStyle = {
-  ...tdStyle,
-  color: "#ff6078",
-  fontWeight: 600
-};
-const tdEmptyStyle = {
-  ...tdStyle,
-  color: "#9c98aa",
-  fontWeight: "normal",
-  fontSize: "16px",
-  textAlign: "center"
+
+const deleteBtnStyle = {
+  background: "linear-gradient(135deg, #EF4444 0%, #DC2626 100%)",
+  color: "white",
+  border: "none",
+  borderRadius: "8px",
+  padding: "8px 16px",
+  cursor: "pointer",
+  fontSize: "12px",
+  fontWeight: "600",
+  transition: "all 0.2s ease",
+  boxShadow: "0 2px 8px rgba(239, 68, 68, 0.3)",
+  textTransform: "uppercase",
+  letterSpacing: "0.5px"
 };

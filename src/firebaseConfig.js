@@ -17,6 +17,7 @@ import { getDatabase } from "firebase/database";
 const firebaseConfig = {
   apiKey: "AIzaSyCc5GXnku0BD7gHuh0dnwWDUYRmtmTW28M",
   authDomain: "moviee-41df7.firebaseapp.com",
+  databaseURL: "https://moviee-41df7-default-rtdb.firebaseio.com/",
   projectId: "moviee-41df7",
   storageBucket: "moviee-41df7.firebasestorage.app",
   messagingSenderId: "435474502713",
